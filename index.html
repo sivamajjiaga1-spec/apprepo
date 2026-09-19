@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineVerse — Book Movie Tickets</title>
+<style>
+/* =========================================================
+   RESET & BASE
+========================================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0e1a;
+  --bg-2: #111827;
+  --bg-3: #1a2235;
+  --card: #151b2b;
+  --border: #232b40;
+  --text: #e8ecf5;
+  --muted: #8b96ad;
+  --accent: #ff2d55;
+  --accent-2: #ffb800;
+  --green: #22c55e;
+  --blue: #3b82f6;
+  --radius: 14px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; border: none; }
+input, select { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* =========================================================
+   HEADER
+========================================================= */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav {
+  max-width: 1300px; margin: 0 auto;
+  padding: 16px 24px;
+  display: flex; align-items: center; gap: 30px;
+}
+.logo {
+  font-size: 1.6rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+}
+.logo span { font-size: 1.4rem; }
+.nav-links { display: flex; gap: 26px; flex: 1; }
+.nav-links a {
+  color: var(--muted); font-weight: 500; font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-actions { display: flex; gap: 12px; align-items: center; }
+.city-select {
+  background: var(--bg-3); color: var(--text);
+  border: 1px solid var(--border); padding: 8px 14px;
+  border-radius: 8px; font-size: 0.9rem; cursor: pointer;
+}
+.btn {
+  padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #ff5c7a);
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,45,85,0.4); }
+.btn-ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--bg-3); }
+
+/* =========================================================
+   HERO
+========================================================= */
+.hero {
+  position: relative;
+  max-width: 1300px; margin: 0 auto;
+  padding: 40px 24px 20px;
+}
+.hero-banner {
+  position: relative;
+  border-radius: 20px; overflow: hidden;
+  height: 420px;
+  background: linear-gradient(135deg, #1e1b4b, #4c1d95, #831843);
+  display: flex; align-items: flex-end;
+  padding: 50px;
+}
+.hero-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(255,45,85,0.4), transparent 50%),
+    radial-gradient(circle at 20% 70%, rgba(59,130,246,0.3), transparent 50%);
+}
+.hero-content { position: relative; z-index: 1; max-width: 620px; }
+.hero-tag {
+  display: inline-block; background: rgba(255,45,85,0.2);
+  color: var(--accent); padding: 6px 14px;
+  border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+  margin-bottom: 14px; letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-size: 2.8rem; line-height: 1.15; margin-bottom: 14px;
+  font-weight: 800;
+}
+.hero p { color: #c4cbe0; margin-bottom: 24px; font-size: 1.05rem; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-large {
+  padding: 14px 28px; border-radius: 10px;
+  font-size: 1rem; font-weight: 600;
+}
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+section {
+  max-width: 1300px; margin: 0 auto;
+  padding: 40px 24px;
+}
+.section-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 26px;
+  flex-wrap: wrap; gap: 14px;
+}
+.section-header h2 {
+  font-size: 1.6rem; font-weight: 700;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-header h2::before {
+  content: ''; width: 5px; height: 24px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 3px;
+}
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 8px 16px; border-radius: 20px;
+  background: var(--bg-3); color: var(--muted);
+  font-size: 0.85rem; font-weight: 500;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.filter-btn.active {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+
+/* =========================================================
+   MOVIE CARDS
+========================================================= */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 22px;
+}
+.movie-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.movie-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  border-color: rgba(255,45,85,0.4);
+}
+.poster {
+  position: relative;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e293b, #334155);
+}
+.poster img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.movie-card:hover .poster img { transform: scale(1.08); }
+.rating-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(0,0,0,0.85);
+  color: var(--accent-2);
+  padding: 5px 10px; border-radius: 8px;
+  font-size: 0.8rem; font-weight: 700;
+  display: flex; align-items: center; gap: 4px;
+}
+.format-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(255,45,85,0.9);
+  color: #fff; padding: 4px 8px;
+  border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.movie-info { padding: 14px; }
+.movie-info h3 {
+  font-size: 1rem; margin-bottom: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.movie-info .meta {
+  color: var(--muted); font-size: 0.8rem; margin-bottom: 10px;
+}
+.movie-info .book-btn {
+  width: 100%; padding: 9px;
+  background: var(--accent); color: #fff;
+  border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+  transition: background 0.2s;
+}
+.movie-info .book-btn:hover { background: #e02648; }
+
+/* =========================================================
+   BOOKING MODAL
+========================================================= */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+  overflow-y: auto;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-2);
+  border-radius: 18px;
+  max-width: 900px; width: 100%;
+  max-height: 92vh; overflow-y: auto;
+  border: 1px solid var(--border);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.modal-header {
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; background: var(--bg-2); z-index: 5;
+}
+.modal-header h3 { font-size: 1.25rem; }
+.close-btn {
+  background: var(--bg-3); color: var(--text);
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 1.2rem; display: flex;
+  align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.close-btn:hover { background: var(--accent); }
+.modal-body { padding: 26px; }
+
+/* Steps indicator */
+.steps {
+  display: flex; gap: 10px; margin-bottom: 26px;
+  padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.step {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 0.85rem;
+  white-space: nowrap;
+}
+.step .num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg-3); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  border: 1px solid var(--border);
+}
+.step.active { color: var(--text); }
+.step.active .num { background: var(--accent); border-color: var(--accent); }
+.step.done .num { background: var(--green); border-color: var(--green); color: #fff; }
+.step-arrow { color: var(--muted); }
+
+/* Modal sections */
+.modal-section { display: none; }
+.modal-section.active { display: block; }
+
+/* Showtimes */
+.date-pills {
+  display: flex; gap: 10px; margin-bottom: 22px;
+  overflow-x: auto; padding-bottom: 6px;
+}
+.date-pill {
+  padding: 10px 18px; border-radius: 10px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  text-align: center; min-width: 78px;
+  transition: all 0.2s; cursor: pointer;
+}
+.date-pill.active {
+  background: var(--accent); border-color: var(--accent);
+}
+.date-pill .day { font-size: 0.75rem; color: var(--muted); }
+.date-pill.active .day { color: rgba(255,255,255,0.85); }
+.date-pill .date { font-size: 1rem; font-weight: 700; }
+
+.theater {
+  background: var(--bg-3); border-radius: 12px;
+  padding: 18px; margin-bottom: 14px;
+  border: 1px solid var(--border);
+}
+.theater h4 { font-size: 1rem; margin-bottom: 4px; }
+.theater .location { color: var(--muted); font-size: 0.8rem; margin-bottom: 14px; }
+.showtimes {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.time-btn {
+  padding: 9px 16px; border-radius: 8px;
+  background: transparent; color: var(--green);
+  border: 1px solid var(--green);
+  font-size: 0.85rem; font-weight: 600;
+  transition: all 0.2s;
+}
+.time-btn:hover { background: var(--green); color: #fff; }
+.time-btn.selected { background: var(--green); color: #fff; }
+
+/* Seat selection */
+.screen {
+  background: linear-gradient(180deg, #334155, #1e293b);
+  height: 12px; border-radius: 50%;
+  margin: 0 auto 40px; max-width: 500px;
+  box-shadow: 0 10px 30px rgba(120,180,255,0.4);
+  position: relative;
+}
+.screen::after {
+  content: 'SCREEN'; position: absolute;
+  top: -22px; left: 50%; transform: translateX(-50%);
+  color: var(--muted); font-size: 0.7rem; letter-spacing: 4px;
+}
+.seat-legend {
+  display: flex; gap: 20px; justify-content: center;
+  margin-bottom: 26px; flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.legend-box {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.legend-box.available { background: transparent; }
+.legend-box.selected { background: var(--green); border-color: var(--green); }
+.legend-box.booked { background: #374151; border-color: #374151; }
+.legend-box.premium { background: transparent; border-color: var(--accent-2); }
+
+.seat-map {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px; margin-bottom: 26px;
+  overflow-x: auto; padding: 10px 0;
+}
+.seat-row { display: flex; gap: 6px; align-items: center; }
+.row-label {
+  width: 22px; color: var(--muted);
+  font-size: 0.75rem; font-weight: 600;
+  text-align: center;
+}
+.seat {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0; /* hide text */
+  position: relative;
+}
+.seat:hover:not(.booked) { transform: scale(1.15); border-color: var(--green); }
+.seat.selected { background: var(--green); border-color: var(--green); }
+.seat.booked {
+  background: #374151; border-color: #374151;
+  cursor: not-allowed;
+}
+.seat.premium { border-color: var(--accent-2); }
+.seat.premium:hover:not(.booked) { border-color: var(--accent-2); }
+.seat.premium.selected { background: var(--accent-2); border-color: var(--accent-2); }
+.gap { width: 20px; }
+
+/* Food & beverages */
+.food-category {
+  margin-bottom: 22px;
+}
+.food-category h4 {
+  font-size: 1rem; margin-bottom: 12px;
+  color: var(--accent-2);
+}
+.food-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.food-item {
+  background: var(--bg-3); border-radius: 10px;
+  padding: 14px; border: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 10px;
+}
+.food-item .info h5 { font-size: 0.9rem; margin-bottom: 3px; }
+.food-item .info .price { color: var(--accent-2); font-weight: 700; font-size: 0.85rem; }
+.qty-control {
+  display: flex; align-items: center; gap: 8px;
+}
+.qty-btn {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--bg-2); color: var(--text);
+  border: 1px solid var(--border);
+  font-size: 1rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.qty-btn:hover { background: var(--accent); }
+.qty-num { min-width: 20px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+
+/* Order summary */
+.summary-card {
+  background: var(--bg-3); border-radius: 12px;
+  padding: 20px; margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.summary-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; font-size: 0.9rem;
+  color: var(--muted);
+}
+.summary-row.total {
+  border-top: 1px solid var(--border);
+  margin-top: 10px; padding-top: 14px;
+  font-size: 1.15rem; font-weight: 700; color: var(--text);
+}
+.summary-row.total span:last-child { color: var(--accent-2); }
+
+/* Payment methods */
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin-bottom: 22px;
+}
+.payment-option {
+  background: var(--bg-3); border: 2px solid var(--border);
+  border-radius: 10px; padding: 16px;
+  cursor: pointer; text-align: center;
+  transition: all 0.2s;
+}
+.payment-option:hover { border-color: var(--accent); }
+.payment-option.selected { border-color: var(--accent); background: rgba(255,45,85,0.08); }
+.payment-option .icon { font-size: 1.6rem; margin-bottom: 6px; }
+.payment-option .name { font-size: 0.85rem; font-weight: 600; }
+
+/* Footer buttons */
+.modal-footer {
+  display: flex; justify-content: space-between;
+  gap: 12px; margin-top: 26px;
+  padding-top: 20px; border-top: 1px solid var(--border);
+}
+
+/* Confirmation */
+.confirm-box { text-align: center; padding: 20px; }
+.confirm-icon {
+  width: 80px; height: 80px; margin: 0 auto 20px;
+  border-radius: 50%;
+  background: rgba(34,197,94,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  animation: pop 0.4s ease;
+}
+@keyframes pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.ticket {
+  background: var(--bg-3); border-radius: 14px;
+  padding: 22px; margin: 22px 0;
+  border: 1px dashed var(--border);
+  text-align: left; position: relative;
+}
+.ticket::before, .ticket::after {
+  content: ''; position: absolute;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--bg-2);
+  top: 50%; transform: translateY(-50%);
+}
+.ticket::before { left: -10px; }
+.ticket::after { right: -10px; }
+.ticket h4 { color: var(--accent-2); margin-bottom: 14px; font-size: 1.1rem; }
+.ticket-row {
+  display: flex; justify-content: space-between;
+  padding: 6px 0; font-size: 0.9rem;
+}
+.ticket-row span:first-child { color: var(--muted); }
+.qr {
+  width: 120px; height: 120px; margin: 18px auto 0;
+  background:
+    repeating-linear-gradient(0deg, #fff 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(90deg, #fff 0 4px, transparent 4px 8px);
+  border-radius: 8px;
+  border: 4px solid #fff;
+}
+
+/* =========================================================
+   FEATURES / SERVICES
+========================================================= */
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+.service-card {
+  background: var(--card);
+  padding: 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.service-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,45,85,0.3);
+}
+.service-card .icon {
+  font-size: 2rem; margin-bottom: 12px;
+}
+.service-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.service-card p { color: var(--muted); font-size: 0.88rem; }
+
+/* =========================================================
+   FOOTER
+========================================================= */
+footer {
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+  padding: 40px 24px 20px;
+  margin-top: 40px;
+}
+.footer-content {
+  max-width: 1300px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.footer-col h4 { margin-bottom: 14px; font-size: 0.95rem; }
+.footer-col a {
+  display: block; color: var(--muted);
+  font-size: 0.88rem; padding: 4px 0;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--accent); }
+.copyright {
+  text-align: center; color: var(--muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  max-width: 1300px; margin: 0 auto;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg-3); color: var(--text);
+  padding: 14px 22px; border-radius: 10px;
+  border-left: 4px solid var(--green);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  z-index: 2000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  font-size: 0.9rem;
+  max-width: 320px;
+}
+.toast.show { transform: translateX(0); }
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero-banner { height: 340px; padding: 30px 24px; }
+  .hero h1 { font-size: 1.9rem; }
+  .hero p { font-size: 0.95rem; }
+  .movies-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  .movie-info { padding: 10px; }
+  .movie-info h3 { font-size: 0.88rem; }
+  .seat { width: 22px; height: 22px; }
+  .gap { width: 12px; }
+  .modal-body { padding: 18px; }
+  .modal-header { padding: 16px 18px; }
+  .steps { font-size: 0.75rem; }
+  .step span:not(.num) { display: none; }
+  .step.active span:not(.num) { display: inline; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <div class="nav">
+    <div class="logo"><span>🎬</span> CineVerse</div>
+    <nav class="nav-links">
+      <a href="#movies">Movies</a>
+      <a href="#services">Services</a>
+      <a href="#">Offers</a>
+      <a href="#">Support</a>
+    </nav>
+    <div class="nav-actions">
+      <select class="city-select">
+        <option>📍 Mumbai</option>
+        <option>📍 Delhi</option>
+        <option>📍 Bangalore</option>
+        <option>📍 Hyderabad</option>
+        <option>📍 Chennai</option>
+      </select>
+      <button class="btn btn-ghost">Sign In</button>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-banner">
+    <div class="hero-content">
+      <span class="hero-tag">🔥 NOW SHOWING</span>
+      <h1>Book Movie Tickets in Seconds</h1>
+      <p>Choose your seats, order snacks, and skip the queue. Your perfect movie night starts here.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary btn-large" onclick="document.getElementById('movies').scrollIntoView()">Browse Movies</button>
+        <button class="btn btn-ghost btn-large">View Offers</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MOVIES ==================== -->
+<section id="movies">
+  <div class="section-header">
+    <h2>Now Showing</h2>
+    <div class="filters">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Action</button>
+      <button class="filter-btn">Comedy</button>
+      <button class="filter-btn">Drama</button>
+      <button class="filter-btn">Sci-Fi</button>
+    </div>
+  </div>
+  <div class="movies-grid" id="moviesGrid"></div>
+</section>
+
+<!-- ==================== SERVICES ==================== -->
+<section id="services">
+  <div class="section-header">
+    <h2>Why Choose CineVerse</h2>
+  </div>
+  <div class="services">
+    <div class="service-card">
+      <div class="icon">🎟️</div>
+      <h3>Instant Booking</h3>
+      <p>Book tickets in under 60 seconds with our streamlined checkout.</p>
+    </div>
+    <div class="service-card">
+      <div class="icon">💺</div>
+      <h3>Choose Your Seat</h3>
+      <p>Interactive seat map with real-time availability and premium recliners.</p>
+    </div>
+    <div class="service-card">
+      <div class="icon">🍿</div>
+      <h3>Food & Beverages</h3>
+      <p>Pre-order snacks and skip the counter. Delivered right to your seat.</p>
+    </div>
+    <div class="service-card">
+      <div class="icon">💳</div>
+      <h3>Secure Payments</h3>
+      <p>UPI, cards, wallets, net banking — 100% secure & instant refunds.</p>
+    </div>
+    <div class="service-card">
+      <div class="icon">🎁</div>
+      <h3>Exclusive Offers</h3>
+      <p>Buy 1 Get 1, cashback, and loyalty points on every booking.</p>
+    </div>
+    <div class="service-card">
+      <div class="icon">📱</div>
+      <h3>e-Ticket Entry</h3>
+      <p>Scan-and-go entry with QR code. No printing, no waiting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== BOOKING MODAL ==================== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Book Tickets</h3>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Steps -->
+      <div class="steps">
+        <div class="step active" data-step="1"><span class="num">1</span><span>Showtime</span></div>
+        <span class="step-arrow">›</span>
+        <div class="step" data-step="2"><span class="num">2</span><span>Seats</span></div>
+        <span class="step-arrow">›</span>
+        <div class="step" data-step="3"><span class="num">3</span><span>Snacks</span></div>
+        <span class="step-arrow">›</span>
+        <div class="step" data-step="4"><span class="num">4</span><span>Payment</span></div>
+        <span class="step-arrow">›</span>
+        <div class="step" data-step="5"><span class="num">5</span><span>Done</span></div>
+      </div>
+
+      <!-- STEP 1: Showtime -->
+      <div class="modal-section active" data-section="1">
+        <h4 style="margin-bottom:14px;">Select Date</h4>
+        <div class="date-pills" id="datePills"></div>
+
+        <h4 style="margin:20px 0 14px;">Select Theater & Showtime</h4>
+        <div id="theatersList"></div>
+      </div>
+
+      <!-- STEP 2: Seats -->
+      <div class="modal-section" data-section="2">
+        <div class="screen"></div>
+        <div class="seat-legend">
+          <div class="legend-item"><div class="legend-box available"></div> Available</div>
+          <div class="legend-item"><div class="legend-box selected"></div> Selected</div>
+          <div class="legend-item"><div class="legend-box booked"></div> Booked</div>
+          <div class="legend-item"><div class="legend-box premium"></div> Premium (+₹50)</div>
+        </div>
+        <div class="seat-map" id="seatMap"></div>
+        <div class="summary-card">
+          <div class="summary-row"><span>Selected Seats</span><span id="selectedSeatsText">—</span></div>
+          <div class="summary-row total"><span>Seat Total</span><span id="seatTotal">₹0</span></div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Food -->
+      <div class="modal-section" data-section="3">
+        <h4 style="margin-bottom:14px;">🍿 Add Snacks (Optional)</h4>
+        <div id="foodList"></div>
+      </div>
+
+      <!-- STEP 4: Payment -->
+      <div class="modal-section" data-section="4">
+        <div class="summary-card" id="finalSummary"></div>
+        <h4 style="margin:20px 0 14px;">Select Payment Method</h4>
+        <div class="payment-methods" id="paymentMethods">
+          <div class="payment-option selected" data-method="UPI">
+            <div class="icon">📱</div>
+            <div class="name">UPI / GPay</div>
+          </div>
+          <div class="payment-option" data-method="Card">
+            <div class="icon">💳</div>
+            <div class="name">Credit / Debit</div>
+          </div>
+          <div class="payment-option" data-method="Wallet">
+            <div class="icon">👛</div>
+            <div class="name">Wallet</div>
+          </div>
+          <div class="payment-option" data-method="NetBanking">
+            <div class="icon">🏦</div>
+            <div class="name">Net Banking</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Confirmation -->
+      <div class="modal-section" data-section="5">
+        <div class="confirm-box">
+          <div class="confirm-icon">✓</div>
+          <h3 style="margin-bottom:8px;">Booking Confirmed!</h3>
+          <p style="color:var(--muted);font-size:0.9rem;">Your e-ticket has been sent to your email</p>
+          <div class="ticket" id="ticketBox"></div>
+          <button class="btn btn-primary btn-large" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer" id="modalFooter">
+        <button class="btn btn-ghost" id="backBtn" onclick="prevStep()" style="display:none;">← Back</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextStep()" disabled>Continue →</button>
+      </div>
+
+    </div>
